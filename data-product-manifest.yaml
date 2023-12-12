@@ -1,4 +1,4 @@
-version: 0.0.13
+version: 0.0.14
 jobId: "782"
 jobName: MSGP_Report
 jobType: Aggregated Data Product
@@ -78,8 +78,7 @@ productState:
   isDynamic: true
   alias: ADP_MSGP_Report
   retentionVersions: ""
-  logicalSchema:
-    properties: {}
+  logicalSchema: ""
   stateStoreType: loadDataIceberg
   isProfilingEnabled: false
   updateStrategy: Overwrite
@@ -138,7 +137,7 @@ transformation:
       Reference_Document_Number, ps.Parts_LMS_Date as Parts_LMS_Date,
       PS.Document_Date AS Document_Date from  PARTS_SALES ps LEFT JOIN (select
       distinct
-      part_num,catg_cd,ROOT_PART_NUM,part_desc,PRINCIPAL_MAP_CD,dealer_map_cd
+      part_num,catg_cd,ROOT_PART_NUM,part_desc,PRINCIPAL_MAP_CD,dealer_map_code
       from parts_accessories_master where catg_cd<>'U' and PRINCIPAL_MAP_CD = 1
       and DEALER_MAP_CODE = 1) pam on trim(ps.Part_Number_pd_issue) =
       trim(pam.PART_NUM) left JOIN (SELECT DISTINCT * FROM Dealer_Master WHERE
