@@ -78,7 +78,8 @@ productState:
   isDynamic: true
   alias: ADP_MSGP_Report
   retentionVersions: ""
-  logicalSchema: ""
+  logicalSchema:
+    properties: {}
   stateStoreType: loadDataIceberg
   isProfilingEnabled: false
   updateStrategy: Overwrite
