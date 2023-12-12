@@ -1,4 +1,4 @@
-version: 0.0.11
+version: 0.0.13
 jobId: "782"
 jobName: MSGP_Report
 jobType: Aggregated Data Product
@@ -22,7 +22,7 @@ inputPorts:
         secretKey: abc
       dataProductUrn: urn:dv:dataproduct:54ddeeb9-ff9a-4d57-8fbc-afafa0d45fe9
     tableName: select * from
-      glue.***catalogReference***.DEALER_MASTER
+      glue.***catalogReference***.`54ddeeb9-ff9a-4d57-8fbc-afafa0d45fe9`
   - alias: Geography_Master_1
     isDynamic: true
     dataProductUrn: urn:dv:dataproduct:53e98ba0-c6f7-4a2f-9d78-0b8a4eefdf71
@@ -78,8 +78,7 @@ productState:
   isDynamic: true
   alias: ADP_MSGP_Report
   retentionVersions: ""
-  logicalSchema:
-    properties: {}
+  logicalSchema: ""
   stateStoreType: loadDataIceberg
   isProfilingEnabled: false
   updateStrategy: Overwrite
@@ -124,20 +123,21 @@ transformation:
       Invoice_Month, DM.location_description as location_description,
       DM.Location_code as location_code, DM.Dealer_Name as Dealer_Name,
       DM.DEALER_MAP_Code as DEALER_MAP_CD, pam.catg_cd as part_category,
-      pam.ROOT_PART_NUM as root_part, pam.part_desc as Part_Description, '' as
-      region, '' as state, '' as city, '' as state_code, ps.enquiry_status as
-      Enquiry_status, Parent_Group_ph_enq as parent_group,
-      SUBSTR(ps.Enquiry_Number,3) as Short_enquiry_number, ps.customer_state as
-      CUSTOMER_STATE, ps.customer_remarks as customer_remarks, DM.FOR_CODE as
-      for_code, DM.MUL_DEALER_Code as dealer_code,  PS.invoice_date as
-      invoice_date, ps.sale_type as sale_type, ps.customer_order_number as
+      pam.ROOT_PART_NUM as root_part, pam.part_desc as Part_Description,
+      IG.REGION_CODE as region, IG.state_name as state, ps.Customer_City as
+      city, IG.state_code as state_code, ps.enquiry_status as Enquiry_status,
+      Parent_Group_ph_enq as parent_group, SUBSTR(ps.Enquiry_Number,3) as
+      Short_enquiry_number, ps.customer_state as CUSTOMER_STATE,
+      ps.customer_remarks as customer_remarks, DM.FOR_CODE as for_code,
+      DM.MUL_DEALER_Code as dealer_code,  PS.invoice_date as invoice_date,
+      ps.sale_type as sale_type, ps.customer_order_number as
       customer_order_number, ps.Company_FA_ph_issue AS Company_FA,
       ps.document_type_ph_issue as Document_type, ps.Document_Number_ph_issue as
       Document_number, ps.Reference_Document_Number as
       Reference_Document_Number, ps.Parts_LMS_Date as Parts_LMS_Date,
       PS.Document_Date AS Document_Date from  PARTS_SALES ps LEFT JOIN (select
       distinct
-      part_num,catg_cd,ROOT_PART_NUM,part_desc,PRINCIPAL_MAP_CD,dealer_map_code
+      part_num,catg_cd,ROOT_PART_NUM,part_desc,PRINCIPAL_MAP_CD,dealer_map_cd
       from parts_accessories_master where catg_cd<>'U' and PRINCIPAL_MAP_CD = 1
       and DEALER_MAP_CODE = 1) pam on trim(ps.Part_Number_pd_issue) =
       trim(pam.PART_NUM) left JOIN (SELECT DISTINCT * FROM Dealer_Master WHERE
@@ -145,7 +145,11 @@ transformation:
       AND PRINCIPAL_MAP_CD = 1) DM on      concat(ps.Parent_Group_ph_enq,'|',
       cast(ps.Dealer_Map_Code_ph_enq as string),'|',ps.Location_Code_ph_enq)
       =      concat(DM.PARENT_GROUP,'|', cast(DM.DEALER_MAP_Code as
-      string),'|',DM.Location_Code)       ) group by  source_of_enquiry,
+      string),'|',DM.Location_Code) left join
+      (         select            distinct
+      state_name,            region_name,            state_code,            region_code          from            geography_master       )
+      ig on TRIM(ps.Customer_State)= TRIM(ig.STATE_CODE)        AND
+      DM.region_code = IG.REGION_CODE       ) group by  source_of_enquiry,
       mode_of_enquiry, Invoice_number, Enq_Customer_Name, Customer_order_date,
       Part_number, Customer_id, Customer_pin, Enquiry_number, Enquiry_date,
       Invoice_Month, Location_description, Location_code, Dealer_Name,
