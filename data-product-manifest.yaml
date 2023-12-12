@@ -22,7 +22,7 @@ inputPorts:
         secretKey: abc
       dataProductUrn: urn:dv:dataproduct:54ddeeb9-ff9a-4d57-8fbc-afafa0d45fe9
     tableName: select * from
-      glue.***catalogReference***.`54ddeeb9-ff9a-4d57-8fbc-afafa0d45fe9`
+      glue.***catalogReference***.DEALER_MASTER
   - alias: Geography_Master_1
     isDynamic: true
     dataProductUrn: urn:dv:dataproduct:53e98ba0-c6f7-4a2f-9d78-0b8a4eefdf71
